@@ -23,5 +23,5 @@ from club_management import clubs
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include(clubs.urls)),
+    path('',include('clubs.urls')),
 ]
