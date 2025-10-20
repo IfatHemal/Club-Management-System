@@ -14,3 +14,14 @@ class User(AbstractUser):
 
     def is_club_admin(self):
         return self.role == self.Role.CLUB_ADMIN
+
+class Club(models.Model):
+    name = models.CharField(max_length=120)
+    slug = models.SlugField(unique=True)
+    description = models.TextField(blank=True)
+    profile_pic = models.ImageField(upload_to='clubs/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    club_admin = models.ForeignKey('User', null=True, blank=True, on_delete=models.SET_NULL, related_name='managed_clubs')
+
+    def __str__(self):
+        return self.name
