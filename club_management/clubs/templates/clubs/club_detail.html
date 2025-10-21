@@ -1,0 +1,27 @@
+{% extends 'clubs/base.html' %}
+{% load static %}
+{% block title %}{{ club.name }} — Club{% endblock %}
+{% block content %}
+  <div class="text-center mb-4">
+    <h1 class="fw-bold">{{ club.name }}</h1>
+    <p>{{ club.description }}</p>
+  </div>
+
+  <div class="row">
+    {% for member in members %}
+    <div class="col-md-6 mb-3">
+      <!-- Added member-card class here -->
+      <div class="member-card d-flex align-items-center p-3 border rounded">
+        <img src="{% if member.profile_pic %}{{ member.profile_pic.url }}{% else %}{% static 'clubs/img/default-profile.png' %}{% endif %}" class="rounded-circle" style="width:80px; height:80px; object-fit:cover;">
+        <div class="ms-3">
+          <h5 class="mb-1">{{ member.full_name }}</h5>
+          <div>{{ member.role }}</div>
+          <div class="text-muted small">{{ member.email }}</div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p>No members yet.</p>
+    {% endfor %}
+  </div>
+{% endblock %}
