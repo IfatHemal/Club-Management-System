@@ -46,3 +46,10 @@ class CustomLoginView(LoginView):
 def logout_view(request):
     logout(request)
     return redirect('clubs:login')
+@login_required
+def home(request):
+    query = request.GET.get('q')
+    clubs = Club.objects.all().order_by('name')
+    if query:
+        clubs = clubs.filter(name__icontains=query)
+    return render(request, 'clubs/home.html', {'clubs': clubs, 'query': query})
