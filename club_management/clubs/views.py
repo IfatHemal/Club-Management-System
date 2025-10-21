@@ -62,3 +62,22 @@ def club_detail(request, slug):
 def head_dashboard(request):
     clubs = Club.objects.all().order_by('name')
     return render(request, 'clubs/head_dashboard.html', {'clubs': clubs})
+@user_passes_test(head_admin_required)
+def create_club(request):
+    if request.method == 'POST':
+        form = ClubForm(request.POST, request.FILES)
+        if form.is_valid():
+            with transaction.atomic():
+                club = form.save(commit=False)
+                club.save()
+                new_admin = form.cleaned_data.get('club_admin')
+                if new_admin:
+
+                    if new_admin.role != User.Role.CLUB_ADMIN:
+                        new_admin.role = User.Role.CLUB_ADMIN
+                        new_admin.save()
+                messages.success(request, f'Club "{club.name}" created.')
+            return redirect('clubs:head_dashboard')
+    else:
+        form = ClubForm()
+    return render(request, 'clubs/create_club.html', {'form': form})
