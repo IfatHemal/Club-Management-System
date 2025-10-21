@@ -43,13 +43,7 @@ class CustomLoginView(LoginView):
             return reverse_lazy('clubs:club_dashboard')
         return reverse_lazy('clubs:home')
 @login_required
-def logout_view(request):
-    logout(request)
-    return redirect('clubs:login')
-@login_required
-def home(request):
-    query = request.GET.get('q')
-    clubs = Club.objects.all().order_by('name')
-    if query:
-        clubs = clubs.filter(name__icontains=query)
-    return render(request, 'clubs/home.html', {'clubs': clubs, 'query': query})
+def club_detail(request, slug):
+    club = get_object_or_404(Club, slug=slug)
+    members = club.members.all()
+    return render(request, 'clubs/club_detail.html', {'club': club, 'members': members})
