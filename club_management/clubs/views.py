@@ -58,3 +58,7 @@ def club_detail(request, slug):
     club = get_object_or_404(Club, slug=slug)
     members = club.members.all()
     return render(request, 'clubs/club_detail.html', {'club': club, 'members': members})
+@user_passes_test(head_admin_required)
+def head_dashboard(request):
+    clubs = Club.objects.all().order_by('name')
+    return render(request, 'clubs/head_dashboard.html', {'clubs': clubs})
