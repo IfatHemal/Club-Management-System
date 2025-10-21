@@ -53,3 +53,8 @@ def home(request):
     if query:
         clubs = clubs.filter(name__icontains=query)
     return render(request, 'clubs/home.html', {'clubs': clubs, 'query': query})
+@login_required
+def club_detail(request, slug):
+    club = get_object_or_404(Club, slug=slug)
+    members = club.members.all()
+    return render(request, 'clubs/club_detail.html', {'club': club, 'members': members})
