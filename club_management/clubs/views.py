@@ -1,6 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login
 from django.views import View
-from .forms import SignUpForm
+from django.urls import reverse_lazy
+from django.contrib.auth.views import LoginView
+
+from .forms import SignUpForm, ClubForm, MemberForm
+from .models import Club, Member, User
 
 class SignUpView(View):
     template_name = 'clubs/signup.html'
@@ -19,3 +24,20 @@ class SignUpView(View):
             login(request, user)
             return redirect('clubs:home')
         return render(request, self.template_name, {'form': form})
+
+class CustomLoginView(LoginView):
+    template_name = 'clubs/login.html'
+
+    def get_success_url(self):
+        user = self.request.user
+
+        try:
+            role = user.role
+        except Exception:
+            return reverse_lazy('clubs:home')
+
+        if role == User.Role.HEAD_ADMIN:
+            return reverse_lazy('clubs:head_dashboard')
+        if role == User.Role.CLUB_ADMIN:
+            return reverse_lazy('clubs:club_dashboard')
+        return reverse_lazy('clubs:home')
