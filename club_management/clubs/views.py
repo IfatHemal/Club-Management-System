@@ -41,3 +41,8 @@ class CustomLoginView(LoginView):
         if role == User.Role.CLUB_ADMIN:
             return reverse_lazy('clubs:club_dashboard')
         return reverse_lazy('clubs:home')
+@login_required
+def club_detail(request, slug):
+    club = get_object_or_404(Club, slug=slug)
+    members = club.members.all()
+    return render(request, 'clubs/club_detail.html', {'club': club, 'members': members})
