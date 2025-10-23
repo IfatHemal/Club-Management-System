@@ -13,6 +13,9 @@ from django.contrib import messages
 def head_admin_required(user):
     return hasattr(user, 'role') and user.role==User.Role.HEAD_ADMIN
 
+def club_admin_required(user):
+    return hasattr(user, 'role') and user.role == User.Role.CLUB_ADMIN
+
 class SignUpView(View):
     template_name = 'clubs/signup.html'
 
