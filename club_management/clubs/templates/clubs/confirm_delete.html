@@ -1,0 +1,9 @@
+{% extends 'clubs/base.html' %}
+{% block content %}
+  <h4>Confirm delete</h4>
+  <p>Are you sure you want to delete this {{ type }}: <strong>{{ object }}</strong>?</p>
+  <form method="post">{% csrf_token %}
+    <button class="btn btn-danger" type="submit">Yes, delete</button>
+    <a class="btn btn-secondary" href="javascript:history.back()">Cancel</a>
+  </form>
+{% endblock %}
