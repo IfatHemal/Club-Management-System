@@ -130,3 +130,8 @@ def add_member(request, club_slug):
     else:
         form = MemberForm()
     return render(request, 'clubs/add_member.html', {'form': form, 'club': club})
+@user_passes_test(club_admin_required)
+def club_dashboard(request):
+
+    clubs = request.user.managed_clubs.all()
+    return render(request, 'clubs/club_admin_dashboard.html', {'clubs': clubs})
