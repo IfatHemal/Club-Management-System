@@ -4,9 +4,14 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required, user_passes_test
-
+from django.http import HttpResponseForbidden
 from .forms import SignUpForm, ClubForm, MemberForm
 from .models import Club, Member, User
+from django.db import transaction
+from django.contrib import messages
+
+def head_admin_required(user):
+    return hasattr(user, 'role') and user.role==User.Role.HEAD_ADMIN
 
 class SignUpView(View):
     template_name = 'clubs/signup.html'
@@ -81,3 +86,18 @@ def create_club(request):
     else:
         form = ClubForm()
     return render(request, 'clubs/create_club.html', {'form': form})
+@user_passes_test(club_admin_required)
+def modify_member(request, pk):
+    member = get_object_or_404(Member, pk=pk)
+    club = member.club
+    if club.club_admin != request.user:
+        return HttpResponseForbidden('You cannot edit this member.')
+    if request.method == 'POST':
+        form = MemberForm(request.POST, request.FILES, instance=member)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Member "{member.full_name}" updated.')
+            return redirect('clubs:manage_members', slug=club.slug)
+    else:
+        form = MemberForm(instance=member)
+    return render(request, 'clubs/modify_member.html', {'form': form, 'member': member})
