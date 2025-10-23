@@ -1,0 +1,13 @@
+{% extends 'clubs/base.html' %}
+{% block content %}
+  <h2>Club Admin Dashboard</h2>
+  {% for club in clubs %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5>{{ club.name }}</h5>
+        <a class="btn btn-sm btn-success" href="{% url 'clubs:add_member' club.slug %}">Add Member</a>
+        <a class="btn btn-sm btn-primary" href="{% url 'clubs:manage_members' club.slug %}">Manage Members</a>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock %}
