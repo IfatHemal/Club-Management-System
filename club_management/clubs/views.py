@@ -151,3 +151,32 @@ def delete_club(request, slug):
         return redirect('clubs:head_dashboard')
 
     return render(request, 'clubs/club_delete.html', {'object': club, 'type': 'club'})
+@user_passes_test(head_admin_required)
+def modify_club(request, slug):
+    club = get_object_or_404(Club, slug=slug)
+    old_admin = club.club_admin
+    if request.method == 'POST':
+        form = ClubForm(request.POST, request.FILES, instance=club)
+        if form.is_valid():
+            with transaction.atomic():
+                club = form.save(commit=False)
+                club.save()
+                new_admin = form.cleaned_data.get('club_admin')
+
+
+                if old_admin and old_admin != new_admin:
+                    still_admin_elsewhere = old_admin.managed_clubs.exclude(pk=club.pk).exists()
+                    if not still_admin_elsewhere:
+                        old_admin.role = User.Role.NORMAL
+                        old_admin.save()
+
+
+                if new_admin and new_admin.role != User.Role.CLUB_ADMIN:
+                    new_admin.role = User.Role.CLUB_ADMIN
+                    new_admin.save()
+
+                messages.success(request, f'Club "{club.name}" updated.')
+            return redirect('clubs:head_dashboard')
+    else:
+        form = ClubForm(instance=club)
+    return render(request, 'clubs/modify_club.html', {'form': form, 'club': club})
