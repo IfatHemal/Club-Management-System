@@ -135,3 +135,10 @@ def club_dashboard(request):
 
     clubs = request.user.managed_clubs.all()
     return render(request, 'clubs/club_admin_dashboard.html', {'clubs': clubs})
+@user_passes_test(club_admin_required)
+def manage_members(request, slug):
+    club = get_object_or_404(Club, slug=slug)
+    if club.club_admin != request.user:
+        return HttpResponseForbidden("You are not the admin of this club.")
+    members = club.members.all().order_by('full_name')
+    return render(request, 'clubs/manage_members.html', {'club': club, 'members': members})
