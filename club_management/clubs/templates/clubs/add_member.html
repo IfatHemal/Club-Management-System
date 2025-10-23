@@ -1,0 +1,27 @@
+{% extends 'clubs/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+  <h3>Add member to {{ club.name }}</h3>
+  <div class="card p-3">
+    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="mb-3">
+        <label class="form-label">Full name</label>
+        {{ form.full_name|add_class:'form-control' }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Role</label>
+        {{ form.role|add_class:'form-select' }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        {{ form.email|add_class:'form-control' }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Profile picture</label>
+        {{ form.profile_pic }}
+      </div>
+      <button class="btn btn-success" type="submit">Add Member</button>
+    </form>
+  </div>
+{% endblock %}
