@@ -112,3 +112,21 @@ def delete_member(request, pk):
         messages.success(request, 'Member deleted.')
         return redirect('clubs:manage_members', slug=club.slug)
     return render(request, 'clubs/confirm_delete.html', {'object': member, 'type': 'member'})
+@user_passes_test(club_admin_required)
+def add_member(request, club_slug):
+    club = get_object_or_404(Club, slug=club_slug)
+
+    if club.club_admin != request.user:
+        return HttpResponseForbidden('You are not the admin of this club.')
+
+    if request.method == 'POST':
+        form = MemberForm(request.POST, request.FILES)
+        if form.is_valid():
+            member = form.save(commit=False)
+            member.club = club
+            member.save()
+            messages.success(request, f'Member "{member.full_name}" added to {club.name}.')
+            return redirect('clubs:manage_members', slug=club.slug)
+    else:
+        form = MemberForm()
+    return render(request, 'clubs/add_member.html', {'form': form, 'club': club})
