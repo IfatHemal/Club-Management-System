@@ -101,3 +101,14 @@ def modify_member(request, pk):
     else:
         form = MemberForm(instance=member)
     return render(request, 'clubs/modify_member.html', {'form': form, 'member': member})
+@user_passes_test(club_admin_required)
+def delete_member(request, pk):
+    member = get_object_or_404(Member, pk=pk)
+    club = member.club
+    if club.club_admin != request.user:
+        return HttpResponseForbidden('You cannot delete this member.')
+    if request.method == 'POST':
+        member.delete()
+        messages.success(request, 'Member deleted.')
+        return redirect('clubs:manage_members', slug=club.slug)
+    return render(request, 'clubs/confirm_delete.html', {'object': member, 'type': 'member'})
