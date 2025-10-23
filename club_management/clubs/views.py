@@ -142,3 +142,12 @@ def manage_members(request, slug):
         return HttpResponseForbidden("You are not the admin of this club.")
     members = club.members.all().order_by('full_name')
     return render(request, 'clubs/manage_members.html', {'club': club, 'members': members})
+@user_passes_test(head_admin_required)
+def delete_club(request, slug):
+    club = get_object_or_404(Club, slug=slug)
+    if request.method == 'POST':
+        club.delete()
+        messages.success(request, f'Club \"{club.name}\" deleted.')
+        return redirect('clubs:head_dashboard')
+
+    return render(request, 'clubs/club_delete.html', {'object': club, 'type': 'club'})
