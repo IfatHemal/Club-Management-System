@@ -1,0 +1,25 @@
+{% extends 'clubs/base.html' %}
+{% block title %}Manage Members — {{ club.name }}{% endblock %}
+{% block content %}
+  <h3>Members of {{ club.name }}</h3>
+  <a class="btn btn-success mb-3" href="{% url 'clubs:add_member' club.slug %}">Add Member</a>
+
+  <table class="table table-striped">
+    <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for m in members %}
+      <tr>
+        <td>{{ m.full_name }}</td>
+        <td>{{ m.role }}</td>
+        <td>{{ m.email }}</td>
+        <td>
+          <a class="btn btn-sm btn-warning" href="{% url 'clubs:modify_member' m.pk %}">Edit</a>
+          <a class="btn btn-sm btn-danger" href="{% url 'clubs:delete_member' m.pk %}">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">No members yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
