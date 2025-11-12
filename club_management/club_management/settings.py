@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'clubs',
+    'widget_tweaks',
 ]
 
 
@@ -134,5 +135,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Login redirect settings
-LOGIN_URL = 'clubs:login'      # login url name
-LOGIN_REDIRECT_URL = 'clubs:home' # after successfull login  will be redirected home
+LOGIN_URL = 'clubs:login'
+LOGIN_REDIRECT_URL = 'clubs:home'
