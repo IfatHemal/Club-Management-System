@@ -211,6 +211,8 @@ def edit_user(request, user_id):
 @user_passes_test(head_admin_required)
 def delete_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
-    user.delete()
-    messages.success(request, 'User deleted successfully!')
-    return redirect('clubs:head_dashboard')
+    if request.method == 'POST':
+        user.delete()
+        messages.success(request, 'User deleted successfully!')
+        return redirect('clubs:head_dashboard')
+    return render(request, 'clubs/delete_user.html', {'user': user})
