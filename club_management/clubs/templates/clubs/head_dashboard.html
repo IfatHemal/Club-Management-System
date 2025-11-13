@@ -37,4 +37,31 @@
       {% endfor %}
     </tbody>
   </table>
+<hr>
+
+  <h2>Manage Club Members</h2>
+  <!-- Club members Management Section -->
+
+
+   <a class="btn btn-success mb-3" href="{% url 'clubs:add_member_head' %}">Add Member</a><br>
+
+  <table class="table table-striped">
+    <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Club</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for m in members %}
+      <tr>
+        <td>{{ m.full_name }}</td>
+        <td>{{ m.role }}</td>
+        <td>{{ m.email }}</td>
+        <td>{{m.club}}</td>
+        <td>
+          <a class="btn btn-sm btn-warning" href="{% url 'clubs:modify_member' m.pk %}">Edit</a>
+          <a class="btn btn-sm btn-danger" href="{% url 'clubs:delete_member' m.pk %}">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">No members yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock %}

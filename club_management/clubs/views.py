@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponseForbidden
-from .forms import SignUpForm, ClubForm, MemberForm
+from .forms import SignUpForm, ClubForm, MemberForm, HeadMemberForm
 from .models import Club, Member, User
 from django.db import transaction
 from django.contrib import messages
@@ -91,18 +91,22 @@ def create_club(request):
     else:
         form = ClubForm()
     return render(request, 'clubs/create_club.html', {'form': form})
-@user_passes_test(club_admin_required)
+#@user_passes_test(club_admin_required)
 def modify_member(request, pk):
     member = get_object_or_404(Member, pk=pk)
     club = member.club
-    if club.club_admin != request.user:
+    if club.club_admin != request.user and not (
+            request.user.is_superuser or request.user.groups.filter(name='head_admin').exists()):
         return HttpResponseForbidden('You cannot edit this member.')
     if request.method == 'POST':
         form = MemberForm(request.POST, request.FILES, instance=member)
         if form.is_valid():
             form.save()
             messages.success(request, f'Member "{member.full_name}" updated.')
-            return redirect('clubs:manage_members', slug=club.slug)
+            if club.club_admin == request.user:
+                return redirect('clubs:manage_members', slug=club.slug)
+            else:
+                return redirect('clubs:head_dashboard')
     else:
         form = MemberForm(instance=member)
     return render(request, 'clubs/modify_member.html', {'form': form, 'member': member})
@@ -110,12 +114,16 @@ def modify_member(request, pk):
 def delete_member(request, pk):
     member = get_object_or_404(Member, pk=pk)
     club = member.club
-    if club.club_admin != request.user:
-        return HttpResponseForbidden('You cannot delete this member.')
+    if club.club_admin != request.user and not (
+            request.user.is_superuser or request.user.groups.filter(name='head_admin').exists()):
+        return HttpResponseForbidden('You cannot edit this member.')
     if request.method == 'POST':
         member.delete()
         messages.success(request, 'Member deleted.')
-        return redirect('clubs:manage_members', slug=club.slug)
+        if club.club_admin == request.user:
+            return redirect('clubs:manage_members', slug=club.slug)
+        else:
+            return redirect('clubs:head_dashboard')
     return render(request, 'clubs/confirm_delete.html', {'object': member, 'type': 'member'})
 @user_passes_test(club_admin_required)
 def add_member(request, club_slug):
@@ -216,3 +224,16 @@ def delete_user(request, user_id):
         messages.success(request, 'User deleted successfully!')
         return redirect('clubs:head_dashboard')
     return render(request, 'clubs/delete_user.html', {'user': user})
+
+@user_passes_test(head_admin_required)
+def add_member_head(request):
+    if request.method == 'POST':
+        form = HeadMemberForm(request.POST, request.FILES)
+        if form.is_valid():
+            member = form.save()
+            messages.success(request, f'Member \"{member.full_name}\" added to {member.club.name}.')
+            return redirect('clubs:head_dashboard')
+    else:
+        form = HeadMemberForm()
+
+    return render(request, 'clubs/add_member_head.html', {'form': form})
