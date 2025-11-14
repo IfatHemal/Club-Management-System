@@ -4,15 +4,18 @@
 <a class="btn btn-warning mb-3" href="{% url 'clubs:change_head_admin' %}">
     Change Head Admin
 </a>
-<br>
+<br><h3>Manage Clubs</h3><br>
   <a class="btn btn-success mb-3" href="{% url 'clubs:create_club' %}">Add Club</a>
   <table class="table table-striped">
-    <thead><tr><th>Club</th><th>Admin</th><th>Actions</th></tr></thead>
+    <thead><tr><th>Club</th><th>Admin</th><th>Admin Change</th><th>Actions</th></tr></thead>
     <tbody>
       {% for club in clubs %}
       <tr>
         <td>{{ club.name }}</td>
         <td>{% if club.club_admin %}{{ club.club_admin.username }}{% else %}-{% endif %}</td>
+        <td><a class="btn btn-sm btn-warning" href="{% url 'clubs:change_club_admin' club.slug %}">
+    Change Club Admin
+</a></td>
         <td>
           <a class="btn btn-sm btn-primary" href="{% url 'clubs:modify_club' club.slug %}">Modify</a>
           <a class="btn btn-sm btn-danger" href="{% url 'clubs:delete_club' club.slug %}">Delete</a>

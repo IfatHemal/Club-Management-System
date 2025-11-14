@@ -260,3 +260,37 @@ def change_head_admin(request):
         return redirect("clubs:head_dashboard")
 
     return render(request, "clubs/change_head_admin.html", {"users": users})
+
+
+@login_required
+@user_passes_test(head_admin_required)
+def change_club_admin(request, club_slug):
+    club = get_object_or_404(Club, slug=club_slug)
+
+    users = User.objects.exclude(role=User.Role.HEAD_ADMIN)
+
+    old_admin = club.club_admin
+
+    if request.method == "POST":
+        selected_user_id = request.POST.get("selected_user")
+        new_admin = User.objects.get(id=selected_user_id)
+
+        club.club_admin = new_admin
+        club.save()
+
+        new_admin.role = User.Role.CLUB_ADMIN
+        new_admin.save()
+
+        still_admin = Club.objects.filter(club_admin=old_admin).exists()
+
+        if not still_admin:
+            old_admin.role = User.Role.NORMAL
+            old_admin.save()
+
+        messages.success(request, f"{club.name} club admin changed successfully!")
+        return redirect("clubs:head_dashboard")
+
+    return render(request, "clubs/change_club_admin.html", {
+        "club": club,
+        "users": users
+    })

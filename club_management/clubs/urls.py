@@ -24,5 +24,6 @@ path('', views.home, name='home'),
     path('modify-member/<int:pk>/', views.modify_member, name='modify_member'),
     path('delete-member/<int:pk>/', views.delete_member, name='delete_member'),
     path('change-head-admin/', views.change_head_admin, name='change_head_admin'),
+    path('change-club-admin/<slug:club_slug>/', views.change_club_admin, name='change_club_admin'),
 ]
 
