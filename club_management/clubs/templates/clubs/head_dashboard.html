@@ -1,6 +1,10 @@
 {% extends 'clubs/base.html' %}
 {% block content %}
   <h2>Head Admin Dashboard</h2>
+<a class="btn btn-warning mb-3" href="{% url 'clubs:change_head_admin' %}">
+    Change Head Admin
+</a>
+<br>
   <a class="btn btn-success mb-3" href="{% url 'clubs:create_club' %}">Add Club</a>
   <table class="table table-striped">
     <thead><tr><th>Club</th><th>Admin</th><th>Actions</th></tr></thead>

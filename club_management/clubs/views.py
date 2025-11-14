@@ -237,3 +237,26 @@ def add_member_head(request):
         form = HeadMemberForm()
 
     return render(request, 'clubs/add_member_head.html', {'form': form})
+
+
+@login_required
+@user_passes_test(head_admin_required)
+def change_head_admin(request):
+    users = User.objects.exclude(role=User.Role.HEAD_ADMIN)
+
+    if request.method == "POST":
+        selected_user_id = request.POST.get("selected_user")
+        new_head_admin = User.objects.get(id=selected_user_id)
+
+        current_head_admin = User.objects.filter(role=User.Role.HEAD_ADMIN).first()
+        if current_head_admin:
+            current_head_admin.role = User.Role.NORMAL
+            current_head_admin.save()
+
+        new_head_admin.role = User.Role.HEAD_ADMIN
+        new_head_admin.save()
+
+        messages.success(request, "Head Admin changed successfully!")
+        return redirect("clubs:head_dashboard")
+
+    return render(request, "clubs/change_head_admin.html", {"users": users})
